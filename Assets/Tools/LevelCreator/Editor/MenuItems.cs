@@ -12,6 +12,7 @@ namespace sweetcli.LevelCreator {
 		public static void CreateLevel(){
 			LevelCreatorUtils.NewLevel();
 		}
+		[MenuItem ("Tools/LevelCreator/Reset Level")]
 		public static void ResetLevel(){
 			LevelCreatorUtils.ResetLevel();
 		}

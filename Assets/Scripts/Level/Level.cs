@@ -15,6 +15,10 @@ namespace RunAndJump {
 		[SerializeField]
 		private int _totalRows;
 
+		[SerializeField]
+		private LevelPiece[] levelPieces;
+
+
 		//not sure the reason for this size.. camera span?
 		public const float GridSize = 1.28f;
 
@@ -50,7 +54,11 @@ namespace RunAndJump {
 			get { return _totalRows; }
 			set { _totalRows = value; }
 		}
-
+		//array to store all prefabs in the level.
+		public LevelPiece[] LevelPieces{
+			set{ levelPieces = value;}
+			get{ return levelPieces;}
+		}
 		//create a grid with the help of Gizoms
 		private void GridFrameGizmo(int columns, int rows){
 			// 0 to End
