@@ -5,7 +5,7 @@ namespace sweetcli.LevelCreator {
 	/// Palette item. created as a ScriptableObject incase we need to expand the funtionality of prefabs later on.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Palette Item")]
-	public class PaletteItem : ScriptableObject {
+	public class PaletteItem : MonoBehaviour {
 		#if UNITY_EDITOR
 		public string itemName;
 		//default to misc

@@ -82,19 +82,29 @@ namespace sweetcli.LevelCreator{
 			}
 
 		}
-		private Texture2D[] DisplayPreviewImages(){
-			Texture2D[] previewTexture = new Texture2D[categorizedItems [selectedCategory].Count];
-			//go throught PaletteItem List at selectedCategory
-			int index = 0;
-			foreach (var item in categorizedItems [selectedCategory]) {
-				previewTexture.SetValue (
-					itemPreview [item], index
-				);
-				index++;
+		private GUIContent[] DisplayGUIContent(){
+			//generate a list
+
+			List<GUIContent> previewTexture = new List<GUIContent> ();
+			if (itemPreview.Count == items.Count) {
 				
 			}
+			int totalItems = categorizedItems [selectedCategory].Count;
+			//go throught PaletteItem List at selectedCategory
+			for (int index = 0; index < totalItems; index++) {
+				//add GUI Content that inclused the itemName and image preview
+				//when a current category is selected and the current item index
+				previewTexture.Add(
+					new GUIContent (
+										 categorizedItems [selectedCategory][index].ItemName,
+										 itemPreview [categorizedItems [selectedCategory][index]]
+				                     )
 
-			return previewTexture;
+				);
+
+			}
+
+			return previewTexture.ToArray ();
 		}
 		private GUIStyle GetGUIEditorStyle(){
 			throw new System.NotImplementedException("TODO");

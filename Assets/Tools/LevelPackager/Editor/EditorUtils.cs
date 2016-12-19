@@ -56,7 +56,7 @@ namespace RunAndJump.LevelPackager {
 		/// Uses a list of generics as available scripts object select themselves
 		///Find Prefab in given path. 
 		///</summary>
-		public static List<T> GetAssetsWithScript<T> (string path) where T : ScriptableObject {
+		public static List<T> GetAssetsWithScript<T> (string path) where T : MonoBehaviour {
 			T tmpObjectType;
 			string assetPath;
 			GameObject assetPrefab;
