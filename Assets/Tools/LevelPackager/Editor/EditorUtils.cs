@@ -52,5 +52,48 @@ namespace RunAndJump.LevelPackager {
 			}
 		}
 
+		///<summary>
+		/// Uses a list of generics as available scripts object select themselves
+		///Find Prefab in given path. 
+		///</summary>
+		public static List<T> GetAssetsWithScript<T> (string path) where T : ScriptableObject {
+			T tmpObjectType;
+			string assetPath;
+			GameObject assetPrefab;
+			List<T> listOfAssests = new List<T> ();
+
+			//for filters, searching for a `types`, the keyword, or key character is (t).
+			// so we search the AssetDatabase with a filter on all prefab types in the path location.
+			string[] guids = AssetDatabase.FindAssets ("t:Prefab", new string[] {path});
+			foreach (var prefabID in guids) {
+				//get the path of the prefab found
+				assetPath = AssetDatabase.AssetPathToGUID (prefabID);
+				//get the actual Gameobject of the asset at path location
+				assetPrefab = AssetDatabase.LoadAssetAtPath (assetPath,typeof(GameObject))as GameObject;
+				tmpObjectType = assetPrefab.GetComponent<T> ();
+				if(tmpObjectType != null){
+					listOfAssests.Add (tmpObjectType);
+				}
+			}
+			return listOfAssests;
+		}
+		/// <summary>
+		/// Gets the list from enum.
+		/// </summary>
+		/// <returns>The list from enum.</returns>
+		/// <typeparam name="T">The 1st type parameter.</typeparam>
+		public static List<T> GetListFromEnum<T>(){
+			List<T> enumList = new List<T>();
+			//don't get this part..
+			//other that a system array called enums gets all enum values of the T type
+			//but don't get how it works, a compiler thing that populates System.Enum?
+			// so on runtime System.Enum.GetValues and T == Misc Enum. all enums of the type is found with getValues?
+			//Checking MSDN confirms this theory as a enumType is a constant and is stored in an array.
+			System.Array enums = System.Enum.GetValues (typeof(T));
+			foreach (T item in enums) {
+				enumList.Add (item);
+			}
+			return enumList;
+		}
 	}
 }

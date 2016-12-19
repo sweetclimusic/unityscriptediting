@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
-
+using sweetcli.LevelCreator;
 namespace RunAndJump {
 	public partial class Level : MonoBehaviour {
-		[SerializeField]
+		//insert custom property
+		[sweetcli.LevelCreator.Time]
 		public int _totalTime = 60;
+
 		[SerializeField]
 		private float _gravity = -30;
 		[SerializeField]

@@ -15,6 +15,8 @@ namespace sweetcli.LevelCreator {
 		private int oldColumnSize;
 		private int oldRowSize;
 		private int minValue;
+		private SerializedObject s_Object;
+		private SerializedProperty s_TotalTimeProperty;
 		#region property
 		public int PrefColumnSize{
 			get{
@@ -75,6 +77,9 @@ namespace sweetcli.LevelCreator {
 
 		#region Custome Methods
 		private void InitLevel(){
+			s_Object = new SerializedObject (targetLevel);
+			//find the serialize field from level.cs
+			s_TotalTimeProperty = s_Object.FindProperty ("_totalTime");
 			//setLevel pieces based on size of array.
 			if (targetLevel.LevelPieces == null || targetLevel.LevelPieces.Length == 0) {
 				targetLevel.LevelPieces = new LevelPiece[ targetLevel.TotalColumns * targetLevel.TotalRows];
@@ -91,9 +96,12 @@ namespace sweetcli.LevelCreator {
 		void DrawDataValues(){
 			//Label to mark first section
 			EditorGUILayout.LabelField ("Data",EditorStyles.boldLabel);
-			targetLevel.Gravity = EditorGUILayout.FloatField ("Graviut",targetLevel.Gravity);
+			//add custom property instead of intField
+			EditorGUILayout.PropertyField (s_TotalTimeProperty);
+			targetLevel.Gravity = EditorGUILayout.FloatField ("Gravity",targetLevel.Gravity);
 			//using Mathf.Max to prevent negative numbers
-			targetLevel.TotalTime = EditorGUILayout.IntField ("Total Time",Mathf.Max (0,targetLevel.TotalTime));
+			//targetLevel.TotalTime = EditorGUILayout.IntField ("Total Time",Mathf.Max (0,targetLevel.TotalTime));
+
 			targetLevel.Bgm = (AudioClip)EditorGUILayout.ObjectField ("Bgm", targetLevel.Bgm, typeof(AudioClip), false);
 			targetLevel.Background = (Sprite)EditorGUILayout.ObjectField ("Background", targetLevel.Background, typeof(Sprite), false);
 			

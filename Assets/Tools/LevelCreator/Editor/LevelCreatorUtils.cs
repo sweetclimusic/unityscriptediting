@@ -31,6 +31,11 @@ namespace sweetcli.LevelCreator {
 			}
 		}
 
+		//menu item entry point
+		//call to function that creates a instance of the editor window that will handle all prefabs available.
+		static void ShowPrefabPalette(){
+			
+		}
 
 		public static void NewLevel(){
 			CreateScene ();
@@ -38,6 +43,10 @@ namespace sweetcli.LevelCreator {
 		}
 		public static void ResetLevel(){
 			ClearScene ();
+		}
+
+		public static void ShowPalette(){
+			ShowPrefabPalette ();
 		}
 
 

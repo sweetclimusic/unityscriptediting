@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using sweetcli.LevelCreator;
 
 namespace RunAndJump {
 
@@ -20,7 +21,10 @@ namespace RunAndJump {
 		private Collider2D _groundCollider;
 		private Collider2D _obstacleCollider;
 		private Rigidbody2D _groundRigidBody;
-		
+		#if UNITY_EDITOR
+		//scriptable object to place a item
+		public PaletteItem paletteItem;
+		#endif
 		private void FixedUpdate () {
 			_groundCollider = Physics2D.OverlapCircle (GroundCheck.position, GROUND_CHECK_RADIUS, WhatIsGround);
 			_obstacleCollider = Physics2D.OverlapCircle (ObstacleCheck.position, OBSTACLE_CHECK_RADIUS, WhatIsObstacle);
