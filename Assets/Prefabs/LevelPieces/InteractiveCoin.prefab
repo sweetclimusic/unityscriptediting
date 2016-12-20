@@ -12,6 +12,7 @@ GameObject:
   - 95: {fileID: 9588616}
   - 58: {fileID: 5859112}
   - 114: {fileID: 11441004}
+  - 114: {fileID: 114000011716555378}
   m_Layer: 10
   m_Name: InteractiveCoin
   m_TagString: Untagged
@@ -74,7 +75,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 788dbfd5a36b2432ba2cb6a9c5f1e27a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paletteItem: {fileID: 11400000, guid: a3c8e420bd3e3448c9fc6cd03d770a4e, type: 2}
   CoinPickupFx: {fileID: 8300000, guid: 7e39ffed45ae24dd9825e56975e2c0d0, type: 3}
 --- !u!212 &21288616
 SpriteRenderer:
@@ -146,3 +146,17 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 188616}
   m_IsPrefabParent: 1
+--- !u!114 &114000011716555378
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 188616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385c7c1e7d1114e9c9a8c4583cbfa9dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Coin
+  category: 1
+  inspectedScript: {fileID: 11441004}

@@ -11,6 +11,7 @@ GameObject:
   - 212: {fileID: 21294640}
   - 61: {fileID: 6150016}
   - 114: {fileID: 11488364}
+  - 114: {fileID: 114000010437619956}
   m_Layer: 12
   m_Name: HazardSpikes
   m_TagString: Untagged
@@ -57,7 +58,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerLoseFx: {fileID: 8300000, guid: da5b86a94a85243f192a7349625bb0e3, type: 3}
-  paletteItem: {fileID: 11400000, guid: e5d18e10c8dbb44ecaa10f4940e9a9f6, type: 2}
 --- !u!212 &21294640
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -118,3 +118,17 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 194640}
   m_IsPrefabParent: 1
+--- !u!114 &114000010437619956
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 194640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385c7c1e7d1114e9c9a8c4583cbfa9dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Spikes
+  category: 3
+  inspectedScript: {fileID: 11488364}

@@ -43,6 +43,7 @@ GameObject:
   - 114: {fileID: 11447308}
   - 61: {fileID: 6172240}
   - 50: {fileID: 5072240}
+  - 114: {fileID: 114000011797657524}
   m_Layer: 11
   m_Name: EnemyYellowFace
   m_TagString: Untagged
@@ -159,7 +160,6 @@ MonoBehaviour:
   WhatIsObstacle:
     serializedVersion: 2
     m_Bits: 2560
-  paletteItem: {fileID: 11400000, guid: 81e5ab1e380d94e0ba201e53b085ab5d, type: 2}
 --- !u!212 &21281614
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -220,3 +220,17 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 181614}
   m_IsPrefabParent: 1
+--- !u!114 &114000011797657524
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 181614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385c7c1e7d1114e9c9a8c4583cbfa9dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Angry Blob
+  category: 2
+  inspectedScript: {fileID: 11447308}

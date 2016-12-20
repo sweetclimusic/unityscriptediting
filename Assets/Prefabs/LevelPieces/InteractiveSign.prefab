@@ -11,6 +11,7 @@ GameObject:
   - 212: {fileID: 21224354}
   - 61: {fileID: 6145878}
   - 114: {fileID: 11433360}
+  - 114: {fileID: 114000011585423688}
   m_Layer: 10
   m_Name: InteractiveSign
   m_TagString: Untagged
@@ -56,7 +57,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdb9e18e386ee46b783b9763aa04ae57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paletteItem: {fileID: 11400000, guid: 4c73b64f1bfdf41d1b2794fe4504698f, type: 2}
   SignFx: {fileID: 8300000, guid: 4751af03703204357b67cb02bd99ee6e, type: 3}
   Message: 
 --- !u!212 &21224354
@@ -119,3 +119,17 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 124354}
   m_IsPrefabParent: 1
+--- !u!114 &114000011585423688
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 124354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385c7c1e7d1114e9c9a8c4583cbfa9dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Sign
+  category: 0
+  inspectedScript: {fileID: 11433360}

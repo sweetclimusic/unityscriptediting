@@ -17,6 +17,13 @@ namespace sweetcli.LevelCreator {
 		private int minValue;
 		private SerializedObject s_Object;
 		private SerializedProperty s_TotalTimeProperty;
+
+		#region prefab selection event
+		private PaletteItem paletteItemSelected;
+		private Texture2D itemPreview;
+		private LevelPiece prefabSelected;
+		#endregion
+
 		#region property
 		public int PrefColumnSize{
 			get{
@@ -53,6 +60,10 @@ namespace sweetcli.LevelCreator {
 		/// Called each time the object is selected
 		/// </summary>
 		void OnEnable(){
+			//assign event for selecting a paletteItem
+
+			PaletteWindow.PaletteItemSelectedEvent +=
+				new PaletteWindow.paletteItemSelectedDelegate (UpdateCurrentPieceInstance);
 			//target is a Editor "gameobject", the object being inspected.
 			//esplicitly cast to target.
 			targetLevel = (Level)target;
@@ -66,11 +77,13 @@ namespace sweetcli.LevelCreator {
 		void OnDisable(){
 		}
 		void OnDestroy(){
+			 PaletteWindow.PaletteItemSelectedEvent -=  new PaletteWindow.paletteItemSelectedDelegate(UpdateCurrentPieceInstance);
 		}
 		public override void OnInspectorGUI(){
 			//DrawDefaultInspector ();
 			DrawDataValues();
 			DrawSizingValues ();
+			DrawPieceSelectedGUI();
 
 		}
 		#endregion
@@ -216,6 +229,27 @@ namespace sweetcli.LevelCreator {
 			EditorGUILayout.EndHorizontal ();
 			EditorGUILayout.EndVertical ();
 
+		}
+
+		private void UpdateCurrentPieceInstance(PaletteItem item, Texture2D preview){
+			paletteItemSelected = item;
+			itemPreview = preview;
+			prefabSelected = (LevelPiece)item.GetComponent <LevelPiece> ();
+			Repaint ();
+		}
+
+		void DrawPieceSelectedGUI(){
+			EditorGUILayout.LabelField ("Selected Level Piece");
+			if (paletteItemSelected == null) {
+				EditorGUILayout.HelpBox ("No Level Piece Selected",MessageType.Info);
+			} else {
+				//follow at cursor position
+				EditorGUILayout.BeginVertical ("box");
+				//use two labels for a image with text underneath
+				EditorGUILayout.LabelField (new GUIContent (itemPreview),GUILayout.Height(40));
+				EditorGUILayout.LabelField (paletteItemSelected.itemName);
+				EditorGUILayout.EndVertical ();
+			}
 		}
 		#endregion
 	}

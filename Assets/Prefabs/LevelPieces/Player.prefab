@@ -29,6 +29,7 @@ GameObject:
   - 58: {fileID: 5872988}
   - 61: {fileID: 6197234}
   - 114: {fileID: 11465072}
+  - 114: {fileID: 114000014084484476}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -136,7 +137,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a67784f635bbd4a0c9f9ebec9ed546aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paletteItem: {fileID: 11400000, guid: c9e601109552a41c48b7238098b13906, type: 2}
   JumpFx: {fileID: 8300000, guid: d0cb0396a536042569ed4dbb4fcd70e2, type: 3}
   MaxSpeed: 6
   JumpSpeed: 14
@@ -204,3 +204,17 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 182878}
   m_IsPrefabParent: 1
+--- !u!114 &114000014084484476
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 182878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385c7c1e7d1114e9c9a8c4583cbfa9dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Timmy
+  category: 0
+  inspectedScript: {fileID: 11465072}

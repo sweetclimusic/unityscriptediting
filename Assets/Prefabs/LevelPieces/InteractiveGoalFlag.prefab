@@ -11,6 +11,7 @@ GameObject:
   - 212: {fileID: 21221132}
   - 61: {fileID: 6125560}
   - 114: {fileID: 11411222}
+  - 114: {fileID: 114000011235775754}
   m_Layer: 10
   m_Name: InteractiveGoalFlag
   m_TagString: Untagged
@@ -56,7 +57,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 448b5519d529c42eba6e5abae8d91052, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paletteItem: {fileID: 11400000, guid: c7cc27cba6a0d4ecda0cd09ce341dbb0, type: 2}
   PlayerWinFx: {fileID: 8300000, guid: efa95f2d3b8114f79b7a58982518108f, type: 3}
 --- !u!212 &21221132
 SpriteRenderer:
@@ -118,3 +118,17 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 121132}
   m_IsPrefabParent: 1
+--- !u!114 &114000011235775754
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 121132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385c7c1e7d1114e9c9a8c4583cbfa9dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Goal Flag
+  category: 0
+  inspectedScript: {fileID: 11411222}

@@ -14,7 +14,6 @@ namespace sweetcli.LevelCreator{
 
 		#region item preview variables
 		private string path = "Assets/Prefabs/LevelPieces";
-		private string soPath = "Assets/ScriptableObjects";
 		//scriptableObjects now!
 		List<PaletteItem> items;
 		Dictionary<Category,List<PaletteItem>> categorizedItems;
@@ -26,6 +25,13 @@ namespace sweetcli.LevelCreator{
 		const float ButtonWidth = 80;
 		const float ButtonHeight = 90;
 		//TODO add the window size scaler
+		#endregion
+
+		#region event delegates
+		//how to do this as a closure/lambda expression again?
+		public delegate void paletteItemSelectedDelegate(PaletteItem item,Texture2D preview);
+		public static event paletteItemSelectedDelegate PaletteItemSelectedEvent;
+
 		#endregion
 
 		#region custom methods
@@ -82,32 +88,66 @@ namespace sweetcli.LevelCreator{
 			}
 
 		}
+
+		/// <summary>
+		/// Generates the prefab previews. using AssetPreview.
+		/// any prefab with the PaletteItem script, get it's preview texture.
+		/// </summary>
+		private void GeneratePrefabPreviews (){
+			//finally fill itemPreview
+			foreach (PaletteItem item in items) {
+				//verify the current paletteItem exists as a key
+				if (!itemPreview.ContainsKey (item)) {
+					itemPreview.Add (
+						item,
+						AssetPreview.GetAssetPreview (
+							item.gameObject
+					) as Texture2D);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Displaies the content of the GUI.
+		/// </summary>
+		/// <returns>The GUI content.</returns>
 		private GUIContent[] DisplayGUIContent(){
 			//generate a list
 
 			List<GUIContent> previewTexture = new List<GUIContent> ();
 			if (itemPreview.Count == items.Count) {
 				
-			}
-			int totalItems = categorizedItems [selectedCategory].Count;
-			//go throught PaletteItem List at selectedCategory
-			for (int index = 0; index < totalItems; index++) {
-				//add GUI Content that inclused the itemName and image preview
-				//when a current category is selected and the current item index
-				previewTexture.Add(
-					new GUIContent (
-										 categorizedItems [selectedCategory][index].ItemName,
-										 itemPreview [categorizedItems [selectedCategory][index]]
-				                     )
+			
+				int totalItems = categorizedItems [selectedCategory].Count;
+				//go throught PaletteItem List at selectedCategory
+				for (int index = 0; index < totalItems; index++) {
+					//add GUI Content that inclused the itemName and image preview
+					//when a current category is selected and the current item index
+					previewTexture.Add (
+						new GUIContent (
+							categorizedItems [selectedCategory] [index].ItemName,
+							itemPreview [categorizedItems [selectedCategory] [index]]
+						)
 
-				);
+					);
 
+				}
 			}
 
 			return previewTexture.ToArray ();
 		}
+		/// <summary>
+		/// Gets the GUI editor style.
+		/// styles a default button to place the image over the label ,centrally align the text of the label.
+		/// </summary>
+		/// <returns>The GUI editor style.</returns>
 		private GUIStyle GetGUIEditorStyle(){
-			throw new System.NotImplementedException("TODO");
+			GUIStyle guiStyle = new GUIStyle (GUI.skin.button);
+			guiStyle.alignment = TextAnchor.LowerCenter;
+			guiStyle.imagePosition = ImagePosition.ImageAbove;
+			guiStyle.fixedWidth = ButtonWidth;
+			guiStyle.fixedHeight = ButtonHeight;
+			return guiStyle;
 		}
 		/// <summary>
 		/// Gets the selected prefab item from categorizedItem based 
@@ -115,11 +155,18 @@ namespace sweetcli.LevelCreator{
 		/// </summary>
 		/// <param name="index">Index.</param>
 		private void GetSelectedPrefabItem(int index = -1){
-			if (index >= 0) {
+			if (index != -1) {
 				PaletteItem item = categorizedItems [selectedCategory] [index];
+				//monitor the event
+				if(!PaletteItemSelectedEvent.Equals (null)){
+					PaletteItemSelectedEvent(item,itemPreview[item]);
+				}
 			}
-		}
 
+		}
+		/// <summary>
+		/// Draws the scroll.
+		/// </summary>
 		private void DrawScroll(){
 			//no items drop out
 			if (categorizedItems [selectedCategory].Count == 0) {
@@ -129,11 +176,13 @@ namespace sweetcli.LevelCreator{
 
 
 			//using button size figure out the total counts
-			int rowCapacity  = (int)Mathf.Floor (position.width / ButtonWidth);
+			int rowCapacity  = Mathf.FloorToInt (position.width / ButtonWidth);
 			int selectedPrefabIndex = -1; // none selected.
+			//render and get current position
 			scrollPosition = GUILayout.BeginScrollView (scrollPosition);
+			//render selection grid and get current selected item
 			selectedPrefabIndex = GUILayout.SelectionGrid (selectedPrefabIndex, 
-				DisplayPreviewImages(),
+				DisplayGUIContent(),
 				rowCapacity,
 				GetGUIEditorStyle ()
 			);
@@ -151,11 +200,11 @@ namespace sweetcli.LevelCreator{
 	///</summary>
 		private void OnEnable(){
 			//build list of Categories
-			if (categories.Equals (null)) {
+			if (categories == null) {
 				InitCategories ();
 			}
 
-			if (categorizedItems.Equals (null)) {
+			if (categorizedItems == null) {
 				InitContent ();
 			}
 		}
@@ -166,7 +215,11 @@ namespace sweetcli.LevelCreator{
 			DrawTabs ();
 			DrawScroll ();
 		}
-		private void Update(){}  // I think there is a better, different Update for editor.
+		private void Update(){
+			if (itemPreview.Count != items.Count) {
+				GeneratePrefabPreviews ();
+			}
+		}  // I think there is a better, different Update for editor.
 		#endregion
 	}
 }

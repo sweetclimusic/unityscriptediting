@@ -65,9 +65,10 @@ namespace RunAndJump.LevelPackager {
 			//for filters, searching for a `types`, the keyword, or key character is (t).
 			// so we search the AssetDatabase with a filter on all prefab types in the path location.
 			string[] guids = AssetDatabase.FindAssets ("t:Prefab", new string[] {path});
+
 			foreach (var prefabID in guids) {
 				//get the path of the prefab found
-				assetPath = AssetDatabase.AssetPathToGUID (prefabID);
+				assetPath = AssetDatabase.GUIDToAssetPath (prefabID);
 				//get the actual Gameobject of the asset at path location
 				assetPrefab = AssetDatabase.LoadAssetAtPath (assetPath,typeof(GameObject))as GameObject;
 				tmpObjectType = assetPrefab.GetComponent<T> ();
