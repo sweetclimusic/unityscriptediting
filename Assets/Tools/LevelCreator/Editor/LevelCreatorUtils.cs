@@ -34,7 +34,7 @@ namespace sweetcli.LevelCreator {
 		//menu item entry point
 		//call to function that creates a instance of the editor window that will handle all prefabs available.
 		static void ShowPrefabPalette(){
-			
+			throw new System.NotImplementedException();
 		}
 
 		public static void NewLevel(){

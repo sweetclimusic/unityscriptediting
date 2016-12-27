@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace RunAndJump {
 	public class Singleton<T> : MonoBehaviour where T: class {

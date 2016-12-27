@@ -158,7 +158,7 @@ namespace sweetcli.LevelCreator{
 			if (index != -1) {
 				PaletteItem item = categorizedItems [selectedCategory] [index];
 				//monitor the event
-				if(!PaletteItemSelectedEvent.Equals (null)){
+				if(PaletteItemSelectedEvent != null){
 					PaletteItemSelectedEvent(item,itemPreview[item]);
 				}
 			}

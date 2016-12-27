@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace RunAndJump {
+﻿namespace RunAndJump {
 
 	public class GameUtils {
 

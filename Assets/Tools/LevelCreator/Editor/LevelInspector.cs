@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using RunAndJump;
-using System;
+
 
 namespace sweetcli.LevelCreator {
 	//overrite the inspector for RunAndJump.Level when ever there is a level.
@@ -10,7 +9,7 @@ namespace sweetcli.LevelCreator {
 	public class LevelInspector : Editor{
 		//instance of the current level
 		private Level targetLevel;
-
+		private LevelInspectorSceneGui sceneGuiTool;
 		//storage
 		private int oldColumnSize;
 		private int oldRowSize;
@@ -70,6 +69,8 @@ namespace sweetcli.LevelCreator {
 			InitLevel ();
 			//sets editorpref oldColumnSize and oldRowSize
 			ResetLevelSize (oldColumnSize,oldRowSize);
+
+			sceneGuiTool = ScriptableObject.CreateInstance<LevelInspectorSceneGui>();
 		}
 		/// <summary>
 		/// Raises the disable event.
@@ -250,6 +251,18 @@ namespace sweetcli.LevelCreator {
 				EditorGUILayout.LabelField (paletteItemSelected.itemName);
 				EditorGUILayout.EndVertical ();
 			}
+		}
+
+		void OnSceneGUI(){
+			sceneGuiTool.DrawModeGui();
+			sceneGuiTool.ModeHandler();
+			sceneGuiTool.MouseEvent();
+			Vector3 worldPoint = Camera.current.ScreenToWorldPoint(sceneGuiTool.MousePoint);
+			Vector3 gridPoint = targetLevel.WorldToGridCoordinates(worldPoint);
+			int col = (int) gridPoint.x;
+    		int row = (int) gridPoint.y;
+    
+    		Debug.LogFormat("GridPos {0},{1}", col, row);
 		}
 		#endregion
 	}

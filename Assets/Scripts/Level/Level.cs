@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using sweetcli.LevelCreator;
 namespace RunAndJump {
 	public partial class Level : MonoBehaviour {
 		//insert custom property
