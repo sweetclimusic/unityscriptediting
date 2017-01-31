@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
 namespace RunAndJump {
 	public partial class Level : MonoBehaviour {
 		//insert custom property
@@ -12,14 +14,14 @@ namespace RunAndJump {
 		[SerializeField]
 		private Sprite _background;
 		[SerializeField]
-		private int _totalColumns;
+		private int _totalColumns = 25;
 		[SerializeField]
-		private int _totalRows;
+		private int _totalRows = 10;
 
 		[SerializeField]
-		private LevelPiece[] levelPieces;
-
-
+		private List <LevelPiece> levelPieces;
+		[SerializeField]
+		public int[][] LevelPieceGridPositions;
 		//not sure the reason for this size.. camera span?
 		public const float GridSize = 1.28f;
 
@@ -56,9 +58,101 @@ namespace RunAndJump {
 			set { _totalRows = value; }
 		}
 		//array to store all prefabs in the level.
-		public LevelPiece[] LevelPieces{
-			set{ levelPieces = value;}
-			get{ return levelPieces;}
+		public LevelPiece setLevelPiece(int col = -1,int row = -1 ,LevelPiece value = null){
+			//do not process
+			if(col == -1 || row == -1 ||  value == null){
+				return null;
+			}
+			levelPieces.Add (value);
+			//store index
+			int index = levelPieces.IndexOf (value);
+			LevelPieceGridPositions [col] [row] = index;
+			return levelPieces[index];
+		}
+		public LevelPiece getLevelPiece(int col,int row){
+			int index = LevelPieceGridPositions [col] [row];
+
+			return index > -1 ? levelPieces[index] : null;
+		}
+		/// <summary>
+		/// Gets or sets the level pieces.
+		/// </summary>
+		/// <value>The level pieces.</value>
+		public List<LevelPiece> LevelPieces{
+			get{
+				return levelPieces;
+			}
+			set {
+				levelPieces = value;
+			}
+		}
+		public void initiateRows(){
+			int unset = -1;
+			for (int c = 0; c < TotalColumns; c++)
+			{
+				LevelPieceGridPositions [c] = new int[TotalRows];
+				for (int r = 0; r < TotalRows; r++) {
+					LevelPieceGridPositions [c] [r] = unset;
+				}
+			}
+		}
+		///<summary>
+		///For the given column erase the rows
+		///</summary>
+		public void unsetRowsForColumn(int colIndex = -1){
+			//TODO removeAt from list, and remove from LevelPieceGridPositions
+			if(colIndex != -1){
+				for (int r = 0; r < TotalRows;r++)
+				{
+					int index = LevelPieceGridPositions [colIndex] [r];
+					LevelPiece piece =  levelPieces[index];
+					if(piece){
+						UnityEngine.Object.DestroyImmediate (piece.gameObject);
+						levelPieces[index] = null;
+						LevelPieceGridPositions [colIndex] [r] = -1;
+					}
+				}
+			}
+		}
+		/// <summary>
+		/// Resizes the coordinate grid.
+		/// </summary>
+		/// <returns>The new coordinate grid.</returns>
+		public bool resizeCoordinateGrid(){
+			//resize the coordinate grid and initiate rows needed
+			int[][] newGrid = new int[TotalColumns][];
+			int maxCapacity = TotalColumns + TotalRows * TotalColumns;
+			List<LevelPiece> newList = new List<LevelPiece> (maxCapacity);
+			int unset = -1;
+			for (int c = 0; c < TotalColumns;c++)
+			{
+				newGrid [c] = new int[TotalRows];
+				for (int r = 0; r < TotalRows; r++) {
+					newGrid [c] [r] = unset;
+				}
+			}
+			//copy old pieces to new list
+			//avoid out of bounds exception
+			int firstLen = this.LevelPieceGridPositions.GetLength (0) -1;
+			int secLen = this.LevelPieceGridPositions.GetLength (1) -1;
+			//as the arrays can be different sizes do a dobl loop
+			for (int c = 0; c < TotalColumns; c++) {
+				if (c >= firstLen) {
+					for (int r = 0; r < TotalRows; r++) {
+						if (r >= secLen) {
+							int cacheIndex = LevelPieceGridPositions [c] [r];
+							newGrid [c] [r] = cacheIndex;
+							//update index of prefabs in new resized grid
+							newList.Insert(cacheIndex,levelPieces[cacheIndex]);
+						}	
+					}
+				}
+			}
+			//update levelPieces
+			levelPieces.Clear ();
+			levelPieces = newList;
+			LevelPieceGridPositions = newGrid;
+			return true;
 		}
 		//create a grid with the help of Gizoms
 		private void GridFrameGizmo(int columns, int rows){

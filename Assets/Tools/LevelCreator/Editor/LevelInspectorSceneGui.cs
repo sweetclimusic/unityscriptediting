@@ -9,12 +9,19 @@ namespace sweetcli.LevelCreator
 		#region mode selection
 		private Mode selectedMode;
 		private Mode currentMode;
+		//check the keyExist.
 		public Mode CurrentMode{
 			get {
-				return currentMode;
+				if (EditorPrefs.HasKey ("sweetcli_currentMode")) {
+					
+					return (Mode)EditorPrefs.GetInt ("sweetcli_currentMode"); 
+				} else {
+					return currentMode;
+				}
 			}
 			set{
 				currentMode = value;
+				EditorPrefs.SetInt ("sweetcli_currentMode", (int)Mathf.Max (0, (int)value));
 			}
 		}
 		public Mode SelectedMode{
@@ -40,20 +47,25 @@ namespace sweetcli.LevelCreator
 				mousePoint = value;
 			}
 		}
-		public void ModeHandler(){
+		public bool ModeHandler(){
+			bool modeUpdated = false;
 			//detect a change to the mode selected
 			if(SelectedMode != CurrentMode){
 				//TODO, do more than update mode selected.
 				CurrentMode = SelectedMode;
+				modeUpdated = true;
 			}
+			
 			//force to 2D view Mode.
 			SceneView.currentDrawingSceneView.in2DMode = true;
+			return modeUpdated;
 		}
 		
-		public void MouseEvent(){
+		public void EventHandler(){
 			HandleUtility.AddDefaultControl(
 				//take control of all events from setting this.
-			GUIUtility.GetControlID(FocusType.Passive));
+				GUIUtility.GetControlID(FocusType.Passive)
+			);
 				//get mouse from the Unity Event.
 			MousePoint = new Vector3(Event.current.mousePosition.x,
 			Camera.current.pixelHeight - Event.current.mousePosition.y,
@@ -78,11 +90,11 @@ namespace sweetcli.LevelCreator
 				//rect are x, y, width, height
 
 				GUILayout.BeginArea(new Rect(10f, 10f, 360f, 40f));
-				SelectedMode = (Mode) GUILayout.Toolbar(
-					(int) CurrentMode,
-					modeLabels.ToArray(),
-					GUILayout.ExpandHeight(true)
-				);
+					SelectedMode = (Mode) GUILayout.Toolbar(
+						(int) CurrentMode,
+						modeLabels.ToArray(),
+						GUILayout.ExpandHeight(true)
+					);
 				GUILayout.EndArea();
 				
 			Handles.EndGUI();

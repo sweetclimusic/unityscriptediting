@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 using RunAndJump;
-
 
 namespace sweetcli.LevelCreator {
 	//overrite the inspector for RunAndJump.Level when ever there is a level.
@@ -9,6 +9,11 @@ namespace sweetcli.LevelCreator {
 	public class LevelInspector : Editor{
 		//instance of the current level
 		private Level targetLevel;
+		#region consistant data
+		private int[][] renderedLevelGrid;
+		[SerializeField]
+		private List<LevelPiece> prefabList;
+		#endregion
 		private LevelInspectorSceneGui sceneGuiTool;
 		//storage
 		private int oldColumnSize;
@@ -16,13 +21,19 @@ namespace sweetcli.LevelCreator {
 		private int minValue;
 		private SerializedObject s_Object;
 		private SerializedProperty s_TotalTimeProperty;
-
+		
 		#region prefab selection event
 		private PaletteItem paletteItemSelected;
+		private PaletteItem paletteItemInspected;
 		private Texture2D itemPreview;
-		private LevelPiece prefabSelected;
 		#endregion
-
+		#region delegates
+		private Dictionary<Mode,System.Action<int,int>> ModeActions;
+		#endregion
+		#region gui handle tool
+		private int	originalPosX;
+		private int	originalPosY;
+		#endregion
 		#region property
 		public int PrefColumnSize{
 			get{
@@ -49,11 +60,13 @@ namespace sweetcli.LevelCreator {
 			}
 			set{
 				oldRowSize = value;
-				EditorPrefs.SetInt ("sweetcli_rowSize", (int)Mathf.Max (0, value) );
+				EditorPrefs.SetInt ("sweetcli_rowSize", (int)Mathf.Max (0, value));
 			}
 		}
 		#endregion
-
+		#region style gui
+		GUIStyle titleStyle;
+		#endregion
 		#region inspector message methods
 		/// <summary>
 		/// Called each time the object is selected
@@ -64,52 +77,105 @@ namespace sweetcli.LevelCreator {
 			PaletteWindow.PaletteItemSelectedEvent +=
 				new PaletteWindow.paletteItemSelectedDelegate (UpdateCurrentPieceInstance);
 			//target is a Editor "gameobject", the object being inspected.
+
 			//esplicitly cast to target.
 			targetLevel = (Level)target;
-			InitLevel ();
-			//sets editorpref oldColumnSize and oldRowSize
-			ResetLevelSize (oldColumnSize,oldRowSize);
-
+			oldRowSize = targetLevel.TotalRows;
+			oldColumnSize = targetLevel.TotalColumns;
 			sceneGuiTool = ScriptableObject.CreateInstance<LevelInspectorSceneGui>();
+
+			InitiateStyle ();
+			//incase OnEnable did nothing?
+			if(ModeActions == null){
+				ModeActions = new Dictionary<Mode,System.Action<int,int>>();
+				ModeActions.Add( Mode.Painting, Paint	);
+				ModeActions.Add( Mode.Delete,  Erase	);
+				ModeActions.Add( Mode.Edit, Edit );
+			}
+			
 		}
+
 		/// <summary>
 		/// Raises the disable event.
 		/// </summary>
 		void OnDisable(){
+			//TODO save prefabList
+			//TODO save renderedLevelGrid
 		}
 		void OnDestroy(){
 			 PaletteWindow.PaletteItemSelectedEvent -=  new PaletteWindow.paletteItemSelectedDelegate(UpdateCurrentPieceInstance);
+			prefabList.Clear ();
+			renderedLevelGrid = null;
 		}
 		public override void OnInspectorGUI(){
 			//DrawDefaultInspector ();
+			InitLevel ();
 			DrawDataValues();
 			DrawSizingValues ();
 			DrawPieceSelectedGUI();
+			DrawInspectedItemGUI ();
+			if (GUI.changed) {
+				Undo.RecordObject(targetLevel, "Level Edit");
+			}
 
 		}
 		#endregion
 
-		#region Custome Methods
+		#region Customs Methods
 		private void InitLevel(){
+			/*
+			 * 
+			 * PrefColumnSize = targetLevel.TotalColumns;
+			 *	PrefRowSize = targetLevel.TotalColumns;
+			 *	oldRowSize 
+			 *	oldColumnSize
+			 * 
+			 */
+
 			s_Object = new SerializedObject (targetLevel);
 			//find the serialize field from level.cs
 			s_TotalTimeProperty = s_Object.FindProperty ("_totalTime");
-			//setLevel pieces based on size of array.
-			if (targetLevel.LevelPieces == null || targetLevel.LevelPieces.Length == 0) {
-				targetLevel.LevelPieces = new LevelPiece[ targetLevel.TotalColumns * targetLevel.TotalRows];
+			//any object marked with hideFlags will not be editable.
+			targetLevel.transform.hideFlags = HideFlags.NotEditable;
+			if (prefabList == null ) {
+				prefabList = new List <LevelPiece>();
 			}
+			if (renderedLevelGrid == null ) {
+				targetLevel.LevelPieceGridPositions = new int[targetLevel.TotalColumns][];
+				targetLevel.initiateRows ();
+				renderedLevelGrid = targetLevel.LevelPieceGridPositions;
+			}
+//			if (prefabList != null ) {
+//				targetLevel.LevelPieces = prefabList;
+//			}
+//			if (renderedLevelGrid != null ) {
+//				targetLevel.LevelPieceGridPositions = renderedLevelGrid;
+//			}
+			//setLevel pieces based on size of array.
+//			if (targetLevel.LevelPieces == null || targetLevel.LevelPieces.Count == 0) {
+//				//get columns and row sizes by setting editorpref oldColumnSize and oldRowSize
+//				//ints do nothing!
+//				ResetLevelSize ();
+//				targetLevel.LevelPieces = new List <LevelPiece> ();
+//				prefabList = new List <LevelPiece>();
+//			}
+//			if (targetLevel.LevelPieceGridPositions == null) {
+//				targetLevel.LevelPieceGridPositions = new int[targetLevel.TotalColumns][];
+//				targetLevel.initiateRows ();
+//				renderedLevelGrid = targetLevel.LevelPieceGridPositions;
+//			}
+			targetLevel.transform.hideFlags = HideFlags.NotEditable;
 		}
 
-		private void ResetLevelSize(int oldColSize, int oldRowSize){
+		private void ResetLevelSize(){
 			//resets the level to last configuration
 			targetLevel.TotalRows = PrefRowSize;
 			targetLevel.TotalColumns = PrefColumnSize;
-
 		}
 
 		void DrawDataValues(){
 			//Label to mark first section
-			EditorGUILayout.LabelField ("Data",EditorStyles.boldLabel);
+			EditorGUILayout.LabelField ("Data",titleStyle);
 			//add custom property instead of intField
 			EditorGUILayout.PropertyField (s_TotalTimeProperty);
 			targetLevel.Gravity = EditorGUILayout.FloatField ("Gravity",targetLevel.Gravity);
@@ -125,52 +191,17 @@ namespace sweetcli.LevelCreator {
 		//Resize level pieces and existing prefabs
 		public void ResizeLevel(){
 			//resize array based on new sizes with Temp array
-				LevelPiece[] newPieceObjectContainers = new LevelPiece[ targetLevel.TotalColumns * targetLevel.TotalRows];
-			bool smallerLevel = (bool)(newPieceObjectContainers.Length > targetLevel.LevelPieces.Length);
+			//resize the coordinate grid and initiate rows needed
+			//copy old pieces to new list
+			//update index of prefabs in new resized grid
+			targetLevel.resizeCoordinateGrid();
 
-			//get existing pieces into the newPieces array
-			for (int col = 0; col < oldColumnSize; col++) {
-				for (int row = 0; row < oldRowSize; row++) {
-					//assign old prefab to new container.
-					if (col < targetLevel.TotalColumns && row < targetLevel.TotalRows) {
-							newPieceObjectContainers [col + row * targetLevel.TotalColumns] =
-							targetLevel.LevelPieces [col + row * oldColumnSize];
-					}
-					else {
-					LevelPiece piece = null;
-					int index = col + row * oldColumnSize;
-					//stay in boundries for array copying
-						if (smallerLevel){
-							//what is smaller?
-							//columns, rows, both.
-							Debug.Log("current col" + col);
-							Debug.Log("current row" + row);
-							Debug.Log(newPieceObjectContainers.Length);
-							Debug.Log(targetLevel.LevelPieces.Length);
-						} 
-
-						//grab the prefab and destroy
-						//TODO goes out of range when shrinks
-						//	if (  targetLevel.LevelPieces.Length > index ) {
-								
-						//	}
-						piece = targetLevel.LevelPieces [index];
-						if (piece != null ) {
-							// we must to use DestroyImmediate in a Editor context
-							UnityEngine.Object.DestroyImmediate (piece.gameObject);
-						}
-					}
-
-				}	//end row loop
-			} //end col loop
-			//reset arrays.
-			targetLevel.LevelPieces = newPieceObjectContainers;
 			PrefColumnSize = targetLevel.TotalColumns;
 			PrefRowSize = targetLevel.TotalRows;
 		}
 
 		void DrawSizingValues(int minValue = 10,int maxValue = 100){
-			EditorGUILayout.LabelField ("Size", EditorStyles.boldLabel);
+			EditorGUILayout.LabelField ("Size", titleStyle);
 			EditorGUILayout.BeginVertical ("box");
 				//keep old size for copying prefabs
 				int oldCols = targetLevel.TotalColumns;
@@ -221,7 +252,7 @@ namespace sweetcli.LevelCreator {
 							"Yes",
 							"No"
 						)){
-							ResetLevelSize (oldCols,oldRows);
+							ResetLevelSize ();
 						}
 					}
 					//reset state
@@ -235,7 +266,6 @@ namespace sweetcli.LevelCreator {
 		private void UpdateCurrentPieceInstance(PaletteItem item, Texture2D preview){
 			paletteItemSelected = item;
 			itemPreview = preview;
-			prefabSelected = (LevelPiece)item.GetComponent <LevelPiece> ();
 			Repaint ();
 		}
 
@@ -253,16 +283,177 @@ namespace sweetcli.LevelCreator {
 			}
 		}
 
+		void DrawInspectedItemGUI(){
+			//TODO error on selection, lose focus,
+			//TODO edit not working or this function
+			//fires for Repaint() and ensure only for edit
+			if (sceneGuiTool.CurrentMode != Mode.Edit) {
+				return;
+			}
+			//design the inspector view for a edit piece
+			EditorGUILayout.LabelField ("Piece Edited",  titleStyle);
+
+			if(paletteItemInspected != null) {
+				EditorGUILayout.BeginVertical("box");
+				EditorGUILayout.LabelField("Name: " + paletteItemInspected.name);
+				//creates a customer editor for target object, in this case a script
+				Editor.CreateEditor( paletteItemInspected.inspectedScript).OnInspectorGUI();
+				EditorGUILayout.EndVertical();
+			} else {
+				EditorGUILayout.HelpBox("No piece to edit!", MessageType.Info);
+			}
+		}
+		/**
+		* Unity Editor scene 'magic' function to extend drawing on to the screen
+		*/
 		void OnSceneGUI(){
 			sceneGuiTool.DrawModeGui();
-			sceneGuiTool.ModeHandler();
-			sceneGuiTool.MouseEvent();
+			if(sceneGuiTool.ModeHandler()){
+				Repaint();
+			}
+			sceneGuiTool.EventHandler();
+			//get the worldPoint and gridPoint from the Camera raycast to mouse position
 			Vector3 worldPoint = Camera.current.ScreenToWorldPoint(sceneGuiTool.MousePoint);
 			Vector3 gridPoint = targetLevel.WorldToGridCoordinates(worldPoint);
+			//cast to int.
 			int col = (int) gridPoint.x;
     		int row = (int) gridPoint.y;
-    
-    		Debug.LogFormat("GridPos {0},{1}", col, row);
+			
+			//We're handling our current mode and there was a mouseclick down  or drag perform an action.
+			//use the EventType to correspond with the Event.current.type
+			if(ModeActions.ContainsKey(sceneGuiTool.CurrentMode) &&
+			(Event.current.type == EventType.MouseDown ||
+			Event.current.type == EventType.MouseDrag )){
+				originalPosX = col;
+				originalPosY = row;
+				ModeActions[sceneGuiTool.CurrentMode](col,row);
+			}
+			if(sceneGuiTool.CurrentMode == Mode.Edit && (Event.current.type == EventType.MouseUp || 
+				Event.current.type == EventType.Ignore)){
+				//try moving
+				if(paletteItemInspected != null) {
+					Move ();
+				}
+			}
+			//enable freeMovement handle
+			if (paletteItemInspected != null) {
+				//from it's position enable the handle
+				paletteItemInspected.transform.position =
+					Handles.FreeMoveHandle (
+					paletteItemInspected.transform.position,
+					paletteItemInspected.transform.rotation,
+					Level.GridSize / 2,
+					Level.GridSize / 2 * Vector3.one,
+					Handles.RectangleCap 
+				);	
+			}
+			
+		}		
+		
+		public void Paint(int col, int row){
+			//out of bounds don't paint
+			if(!targetLevel.IsInsideGridBounds(col,row)){
+				return;
+			}
+			//paint over a piece
+			DestroyLevelPiece(col,row);
+			//paint new one 
+			//TODO mark dirty when change done.
+			EditorGUI.BeginChangeCheck();
+			if (EditorGUI.EndChangeCheck ()) {
+				Undo.RecordObject (target, "obj.name Added");
+			}
+			GameObject obj = PrefabUtility.InstantiatePrefab(paletteItemSelected.transform.gameObject) as GameObject;
+			//set the new prefab as a child to the level
+			obj.transform.parent = targetLevel.transform;
+			obj.name = string.Format("[{0},{1}][{2}]", col, row, obj.name);
+			obj.transform.position = targetLevel.GridToWorldCoordinates(col,row);
+			obj.hideFlags = HideFlags.HideInHierarchy;
+			var gamepiece = obj.GetComponent<LevelPiece> ();
+
+			//add new prefab to level pieces array
+			//targetLevel.setLevelPiece(col,row,gamepiece);
+
+			prefabList.Add (gamepiece);
+			renderedLevelGrid[col][row] = prefabList.IndexOf (gamepiece);
+
+
+		}
+		public void Edit(int col, int row){
+			// we were general to get to this function, but don't want to handle drag when editing.
+			if (targetLevel.IsInsideGridBounds (col, row)) {
+				//in bounds..
+				int cacheIndex = renderedLevelGrid [col] [row];
+				LevelPiece validPiece = cacheIndex > -1 ? prefabList [cacheIndex] : null;
+				if (validPiece != null) {
+					paletteItemInspected = prefabList [cacheIndex].GetComponent <PaletteItem> () as PaletteItem;
+				} 
+			} else {
+				paletteItemInspected = null;		
+			}
+			Repaint ();
+		}
+		//allows prefab moving in level designer.
+		//only works in edit mode
+		public void Move(){
+			Vector3 gridPoint = targetLevel.WorldToGridCoordinates (paletteItemInspected.transform.position);
+			int col = (int)gridPoint.x;
+			int row = (int)gridPoint.y;
+			//at same positon do nothing
+			if(col == originalPosX && row == originalPosY) {
+				return;
+			}
+			//continue;
+			int index = renderedLevelGrid[col][row];
+			LevelPiece validPiece = index > -1 ? prefabList [index] : null;
+			//if in point or a valid prefab.
+			if (!targetLevel.IsInsideGridBounds (col,row) || validPiece != null) {
+				//return to original location
+				paletteItemInspected.transform.position = targetLevel.GridToWorldCoordinates (originalPosX, originalPosY);
+			} else {
+				//move the prefab
+				paletteItemInspected.transform.position = targetLevel.GridToWorldCoordinates (originalPosX, originalPosY);
+				//update the jaggedArray
+				renderedLevelGrid [originalPosX] [originalPosY] = -1;
+				renderedLevelGrid [col] [row] = index;
+				paletteItemInspected.transform.position = targetLevel.GridToWorldCoordinates(col,row);
+			}
+
+		}
+
+		bool DestroyLevelPiece(int col, int row)
+		{
+//			LevelPiece validPiece = targetLevel.getLevelPiece (col, row);
+//			int cacheIndex = targetLevel.LevelPieceGridPositions [col] [row];
+			int cacheIndex = renderedLevelGrid [col] [row];
+			LevelPiece validPiece = cacheIndex > -1 ? prefabList [cacheIndex] : null;
+			if (validPiece != null  ) {
+				//by destroying the gameObject at position
+				//targetLevel.LevelPieces [cacheIndex] = null;
+				//can't removeAT, doing so will delete index and deduct index, changing the key. as the key will be lowered. 
+				prefabList [cacheIndex] = null;
+				//targetLevel.LevelPieceGridPositions [col] [row] = -1;
+				renderedLevelGrid [col] [row] = -1;
+				DestroyImmediate (validPiece.transform.gameObject);
+				return true;
+			}
+			return false;
+		}
+
+		public void Erase(int col,int row){
+			if(!targetLevel.IsInsideGridBounds(col,row)){
+				return;
+			}
+			//paint over a piece
+			DestroyLevelPiece (col, row);
+		}
+		#endregion
+
+		#region style functions
+		void InitiateStyle(){
+			titleStyle = new GUIStyle ();
+			titleStyle.alignment = TextAnchor.MiddleCenter;
+			titleStyle.fontSize = 16;
 		}
 		#endregion
 	}

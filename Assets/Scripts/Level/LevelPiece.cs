@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace RunAndJump {
+	[System.Serializable]
 	public class LevelPiece : MonoBehaviour {
 
 	}
