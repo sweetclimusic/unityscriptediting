@@ -8,7 +8,7 @@ namespace sweetcli.LevelCreator {
 	[CustomEditor(typeof(RunAndJump.Level))]
 	public class LevelInspector : Editor{
 		//instance of the current level
-		private Level targetLevel;
+		private RunAndJump.Level targetLevel;
 		#region consistant data
 		private int[][] renderedLevelGrid;
 		[SerializeField]

@@ -13,8 +13,10 @@ namespace RunAndJump {
 			AudioPlayer.Instance.StopBgm();
 		}
 
-		private void SetBuildInfo () {
+		private void SetBuildInfo() {
 			string info = "";
+			info += "Hash: " + AppBuilder.BuildInfo.Hash +"\n";
+			info += "Date: " + AppBuilder.BuildInfo.Date;
 			BuildInfoText.text = info;
 		}
 
