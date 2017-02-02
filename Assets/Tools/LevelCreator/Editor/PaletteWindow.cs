@@ -33,7 +33,9 @@ namespace sweetcli.LevelCreator{
 		public static event paletteItemSelectedDelegate PaletteItemSelectedEvent;
 
 		#endregion
-
+		#region GUIStyles
+		GUIStyle tabStyle;
+		#endregion
 		#region custom methods
 
 		public static void ShowPaletteWindow(){
@@ -64,7 +66,7 @@ namespace sweetcli.LevelCreator{
 		private void DrawTabs(){
 
 			//select the current tab from the available labels
-			int index = GUILayout.Toolbar ((int)selectedCategory, categoryLabels.ToArray ());
+			int index = GUILayout.Toolbar ((int)selectedCategory, categoryLabels.ToArray (),tabStyle);
 			//update which is selected
 			selectedCategory = categories[index];
 
@@ -207,6 +209,7 @@ namespace sweetcli.LevelCreator{
 			if (categorizedItems == null) {
 				InitContent ();
 			}
+			InitStyles ();
 		}
 		private void OnDisabled(){}
 		private void OnDestory(){}
@@ -220,6 +223,34 @@ namespace sweetcli.LevelCreator{
 				GeneratePrefabPreviews ();
 			}
 		}  // I think there is a better, different Update for editor.
+		#endregion
+		#region guiStyling
+		private void InitStyles() {
+
+			tabStyle = new GUIStyle();
+			tabStyle.alignment = TextAnchor.MiddleCenter;
+			tabStyle.fontSize = 16;
+
+			//get Resources
+			Texture2D tabNormal = (Texture2D)  
+				Resources.Load("Tab_Normal");
+			Texture2D tabSelected = (Texture2D)  
+				Resources.Load("Tab_Selected");
+			Font tabFont = (Font) 
+				Resources.Load("Oswald-Regular");
+
+			//normal tab
+			tabStyle.font = tabFont;
+			tabStyle.fixedHeight = 40;
+			tabStyle.normal.background = tabNormal;
+			tabStyle.normal.textColor = Color.grey;
+
+
+			tabStyle.onNormal.background = tabSelected;
+			tabStyle.onNormal.textColor = Color.black;
+			//adding a border act like 9 slicing. so only the middle is strecthed.
+			tabStyle.border = new RectOffset(18, 18, 24, 4);
+		}
 		#endregion
 	}
 }

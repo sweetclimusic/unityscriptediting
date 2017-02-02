@@ -8,18 +8,29 @@ namespace sweetcli.LevelCreator {
 	/// </summary>
 	public static class MenuItems {
 		//create a new scene
-		[MenuItem ("Tools/LevelCreator/New Level %_l")]
+		[MenuItem ("Tools/Level Creator/New Level %_l")]
 		public static void CreateLevel(){
 			LevelCreatorUtils.NewLevel();
 		}
-		[MenuItem ("Tools/LevelCreator/Show Palette _p")]
+		[MenuItem ("Tools/Level Creator/Show Palette _p")]
 		public static void ShowPaletteWindow(){
 			PaletteWindow.ShowPaletteWindow();
 		}
 
-		[MenuItem ("Tools/LevelCreator/Reset Level %_#_r")]
+		[MenuItem ("Tools/Level Creator/Reset Level %_#_r")]
 		public static void ResetLevel(){
 			LevelCreatorUtils.ResetLevel();
+		}
+		[MenuItem ("Tools/Level Creator/New Level Settings")]
+		private static void NewLevelSettings () {
+			string path = EditorUtility.SaveFilePanelInProject(
+				"New Level Settings",
+				"LevelSettings",
+				"asset",
+				"Define the name for the LevelSettings asset");
+			if(path != "") {
+				RunAndJump.LevelPackager.EditorUtils.CreateAsset<RunAndJump.LevelSettings>(path);
+			}
 		}
 //      adding shortcuts
 //		String Key

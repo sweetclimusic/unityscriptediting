@@ -96,5 +96,28 @@ namespace RunAndJump.LevelPackager {
 			}
 			return enumList;
 		}
+
+		public static List<T> GetSavedIndexes<T>(){
+			List<T> retrivedList = new List<T>();
+			//Look at all the components that exist under parent gameobject Level
+			//Look in the AssestDB for the indexes....
+			//TODO finish not perfect... but want to be able to use tools on exisisting objects.
+			return retrivedList;
+		}
+
+		/// <summary>
+		/// Creates the asset by creating a Instance of ScriptableObject
+		/// </summary>
+		/// <returns>The asset.</returns>
+		/// <param name="path">Asset Path.</param>
+		/// <typeparam name="T">The 1st type parameter. which is always a ScriptableObject </typeparam>
+		public static T CreateAsset<T>(string path) where T : ScriptableObject{
+			T dataClass = (T)ScriptableObject.CreateInstance<T>();
+			//add to the AssetDatabase, refresh and save it.
+			AssetDatabase.CreateAsset (dataClass,path);
+			AssetDatabase.Refresh ();
+			AssetDatabase.SaveAssets ();
+			return dataClass;
+		}
 	}
 }

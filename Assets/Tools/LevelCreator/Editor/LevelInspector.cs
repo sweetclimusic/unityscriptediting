@@ -176,15 +176,30 @@ namespace sweetcli.LevelCreator {
 		void DrawDataValues(){
 			//Label to mark first section
 			EditorGUILayout.LabelField ("Data",titleStyle);
+			//new box
+			EditorGUILayout.BeginVertical ("box");
 			//add custom property instead of intField
 			EditorGUILayout.PropertyField (s_TotalTimeProperty);
-			targetLevel.Gravity = EditorGUILayout.FloatField ("Gravity",targetLevel.Gravity);
-			//using Mathf.Max to prevent negative numbers
-			//targetLevel.TotalTime = EditorGUILayout.IntField ("Total Time",Mathf.Max (0,targetLevel.TotalTime));
+			//save and disbale
+			targetLevel.Settings = (LevelSettings)EditorGUILayout.ObjectField ("Level Settings",
+				targetLevel.Settings, typeof(LevelSettings), false);
+			if (targetLevel.Settings) {
+				//create it 
+				Editor.CreateEditor (targetLevel.Settings).OnInspectorGUI();
+			} else {
+				//use the existing(current) EditorGUI
+				EditorGUILayout.HelpBox ("Please attach a Level Settings scriptableObject",MessageType.Warning);
+			}
 
-			targetLevel.Bgm = (AudioClip)EditorGUILayout.ObjectField ("Bgm", targetLevel.Bgm, typeof(AudioClip), false);
-			targetLevel.Background = (Sprite)EditorGUILayout.ObjectField ("Background", targetLevel.Background, typeof(Sprite), false);
-			
+			EditorGUILayout.EndVertical();
+//			targetLevel.Gravity = EditorGUILayout.FloatField ("Gravity",targetLevel.Gravity);
+//			//using Mathf.Max to prevent negative numbers
+//			//targetLevel.TotalTime = EditorGUILayout.IntField ("Total Time",Mathf.Max (0,targetLevel.TotalTime));
+//
+//			targetLevel.Bgm = (AudioClip)EditorGUILayout.ObjectField ("Bgm", targetLevel.Bgm, typeof(AudioClip), false);
+//			targetLevel.Background = (Sprite)EditorGUILayout.ObjectField ("Background", targetLevel.Background, typeof(Sprite), false);
+//
+			targetLevel.SetGravity ();
 		}
 
 
@@ -270,7 +285,7 @@ namespace sweetcli.LevelCreator {
 		}
 
 		void DrawPieceSelectedGUI(){
-			EditorGUILayout.LabelField ("Selected Level Piece");
+			EditorGUILayout.LabelField ("Selected Level Piece",titleStyle);
 			if (paletteItemSelected == null) {
 				EditorGUILayout.HelpBox ("No Level Piece Selected",MessageType.Info);
 			} else {
@@ -451,9 +466,22 @@ namespace sweetcli.LevelCreator {
 
 		#region style functions
 		void InitiateStyle(){
-			titleStyle = new GUIStyle ();
-			titleStyle.alignment = TextAnchor.MiddleCenter;
-			titleStyle.fontSize = 16;
+			GUISkin skin = (GUISkin)Resources.Load("Demo_GUISkin");
+			titleStyle = skin.label;
+//			titleStyle.alignment = TextAnchor.MiddleCenter;
+//			titleStyle.fontSize = 16;
+
+			//grab resource from the resource directory
+			//not textures in editor must have the right type in their inspector window
+//			Texture2D titleBg = (Texture2D)  
+//				Resources.Load("Color_Bg");
+//			Font titleFont = (Font) 
+//				Resources.Load("Oswald-Regular");
+			//.normal referes to the state. a label only has normal. but if there was a button, 
+			//there would be a pressed state that could be styled a different way
+//			titleStyle.normal.background = titleBg;
+//			titleStyle.normal.textColor = Color.white;
+//			titleStyle.font = titleFont;
 		}
 		#endregion
 	}
