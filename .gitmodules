@@ -1,6 +1,0 @@
-[submodule "Assets/Tools/AppBuilder"]
-	path = Assets/Tools/AppBuilder
-	url = git@github.com:angelotadres/AppBuilder.git
-[submodule "Assets/Tools/unityappbuilder"]
-	path = Assets/Tools/unityappbuilder
-	url = git@github.com:sweetclimusic/unityappbuilder.git
