@@ -1,0 +1,3 @@
+[submodule "Assets/Tools/AppBuilder"]
+	path = Assets/Tools/AppBuilder
+	url = git@github.com:sweetclimusic/AppBuilder.git
